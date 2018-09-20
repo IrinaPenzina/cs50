@@ -32,8 +32,8 @@ bool check(const char *word)
     {
         return true;
     }
-
-    for(int n = 0; n < len; n++)
+    //checking line by line
+    for (int n = 0; n < len; n++)
     {
         if (word[n] == '\n')
         {
@@ -44,15 +44,17 @@ bool check(const char *word)
         {
             index = 26;
         }
+        //turns to low case
         else
         {
             index = (int)tolower(word[n]) - (int)'a';
         }
-
+        //if there's no children
         if (cursor -> children[index] == NULL)
         {
             return false;
         }
+        //if it exists already
         else if (cursor -> children[index] != NULL)
         {
             cursor = cursor -> children[index];
@@ -82,10 +84,10 @@ bool load(const char *dictionary)
 
     //for every dictionary word
     char s[LENGTH];
-    while(fgets(s, LENGTH, file) != NULL)
+    while (fgets(s, LENGTH, file) != NULL)
     {
         cursor = root;
-        for(int n = 0; n < strlen(s); n++)
+        for (int n = 0; n < strlen(s); n++)
         {
             char c = s[n];
             if (c == '\n')
@@ -94,7 +96,7 @@ bool load(const char *dictionary)
                 count++;
                 break;
             }
-
+            //for apostraphe
             if (c == '\'')
             {
                 index = 26;
@@ -112,7 +114,7 @@ bool load(const char *dictionary)
                 memset(cursor -> children[index] -> children, '\0', sizeof(cursor -> children[index] -> children));
                 cursor -> children[index] -> is_word = false;
             }
-
+            //set cursor to next child
             cursor = cursor -> children[index];
         }
     }
@@ -132,14 +134,14 @@ bool unload(void)
     release(root);
     return true;
 }
-
-void release (node * x)
+//release nodes
+void release(node *x)
 {
     for (int i = 0; i < 27; i++)
     {
         if (x != NULL && x -> children[i] != NULL)
         {
-            release (x -> children[i]);
+            release(x -> children[i]);
         }
     }
 
