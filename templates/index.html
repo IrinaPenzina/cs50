@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    <div class="col">
+        <form action="/compare" enctype="multipart/form-data" method="post">
+            <!--to upload files a and b-->
+            <form>
+                <input type = "file" name = "a" accept = "image/*" />
+                <input type = "file" name = "b" accept = "image/*" />
+            </form>
+            <!-- select the way how to compare files -->
+            <form>
+                <select name = "dropdown">
+                    <option value = "lines" selected>Lines</option>
+                    <option value = "sentences">Sentences</option>
+                    <option value = "substrings">Substring</option>
+                </select>
+            </form>
+            <form >
+                Positive number: <input type = "text" name = "positive_number" />
+            </form>
+            <form>
+                <input type = "submit" name = "submit" value = "Submit" />
+            </form>
+        </form>
+    </div>
+
+{% endblock %}
