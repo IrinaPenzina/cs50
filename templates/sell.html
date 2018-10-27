@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Sell
+{% endblock %}
+
+{% block main %}
+    <form action="/sell" method="post">
+        <div class="form-group">
+            <select autocomplete="off" autofocus class="form-control" name="symbol" placeholder="e.g., AMZN" type="text"/>
+               <option disable selected value="">Symbol</option>
+                    {% for portfolio in portfolios %}
+                        <option value = "Symbol">{{ portfolio.symbol }}</option>
+                    {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input autocomplete="off" autofocus class="form-control" name="shares" placeholder="Shares" type="integers"/>
+        </div>
+        <div class="form-group">
+            <button class="btn btn-default" type="submit">Sell</button>
+        </div>
+    </form>
+{% endblock %}
+
+
