@@ -20,7 +20,7 @@ $(document).ready(function() {
             featureType: "all",
             elementType: "labels",
             stylers: [
-                {visibility: "off"}
+                { visibility: "off" }
             ]
         },
 
@@ -29,7 +29,7 @@ $(document).ready(function() {
             featureType: "road",
             elementType: "geometry",
             stylers: [
-                {visibility: "off"}
+                { visibility: "off" }
             ]
         }
 
@@ -38,7 +38,7 @@ $(document).ready(function() {
     // Options for map
     // https://developers.google.com/maps/documentation/javascript/reference#MapOptions
     let options = {
-        center: {lat: 42.3770, lng: -71.1256}, // Cambridge
+        center: { lat: 42.3770, lng: -71.1256 }, // Cambridge
         disableDefaultUI: true,
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         maxZoom: 14,
@@ -61,9 +61,8 @@ $(document).ready(function() {
 
 
 // Add marker for place to map
-function addMarker(place)
-{
-    var myLatlng = {lat: place.latitude, lng: place.longitude};
+function addMarker(place) {
+    var myLatlng = { lat: place.latitude, lng: place.longitude };
 
     var marker = new google.maps.Marker({
         position: myLatlng,
@@ -73,45 +72,38 @@ function addMarker(place)
     });
 
     // get articles for place
-    $.getJSON(("/articles"), {geo: place.postal_code}, function(articles) {
+    $.getJSON(("/articles"), { geo: place.postal_code }, function(articles) {
 
         // Only display infowindow if articles exist
-        if (!$.isEmptyObject(articles))
-        {
-			// start Unordered List
+        if (!$.isEmptyObject(articles)) {
+            // start Unordered List
             var articlesContent = "<ul>";
-            for (var i = 0; i < articles.length; i++)
-            {
-				//Each list item is stored into articlesString
-            	articlesContent += "<li><a target='_NEW' href='" + articles[i].link
-            	+ "'>" + articles[i].title + "</a></li>";
+            for (var i = 0; i < articles.length; i++) {
+                //Each list item is stored into articlesString
+                articlesContent += "<li><a target='_NEW' href='" + articles[i].link
+                    + "'>" + articles[i].title + "</a></li>";
             }
         }
-
         // close the unordered list of articles
-		articlesContent += "</ul>";
-
-		// listen for clicks on marker
+        articlesContent += "</ul>";
+        // listen for clicks on marker
         google.maps.event.addListener(marker, 'click', function() {
             showInfo(marker, articlesContent);
-		});
+        });
     });
-
     // add marker to the map markers
     markers.push(marker);
 }
 
 
 // Configure application
-function configure()
-{
+function configure() {
     // Update UI after map has been dragged
     google.maps.event.addListener(map, "dragend", function() {
 
         // If info window isn't open
         // http://stackoverflow.com/a/12410385
-        if (!info.getMap || !info.getMap())
-        {
+        if (!info.getMap || !info.getMap()) {
             update();
         }
     });
@@ -125,8 +117,7 @@ function configure()
     $("#q").typeahead({
         highlight: false,
         minLength: 1
-    },
-    {
+    }, {
         display: function(suggestion) { return null; },
         limit: 10,
         source: search,
@@ -134,7 +125,7 @@ function configure()
             suggestion: Handlebars.compile(
                 "<div>" +
                 "{{postal_code}}, {{place_name}}, {{admin_name1}}, {{admin_code1}}," +
-                "{{admin_name2}}, {{admin_code2}}"  +
+                "{{admin_name2}}, {{admin_code2}}" +
                 "</div>"
             )
         }
@@ -144,7 +135,7 @@ function configure()
     $("#q").on("typeahead:selected", function(eventObject, suggestion, name) {
 
         // Set map's center
-        map.setCenter({lat: parseFloat(suggestion.latitude), lng: parseFloat(suggestion.longitude)});
+        map.setCenter({ lat: parseFloat(suggestion.latitude), lng: parseFloat(suggestion.longitude) });
 
         // Update UI
         update();
@@ -172,19 +163,16 @@ function configure()
 
 
 // Remove markers from map
-function removeMarkers()
-{
+function removeMarkers() {
     // remove all markers from the map
-    for (var i = 0, n = markers.length; i < n; i++)
-    {
-	    markers[i].setMap(null);
+    for (var i = 0, n = markers.length; i < n; i++) {
+        markers[i].setMap(null);
     }
 }
 
 
 // Search database for typeahead's suggestions
-function search(query, syncResults, asyncResults)
-{
+function search(query, syncResults, asyncResults) {
     // Get places matching query (asynchronously)
     let parameters = {
         q: query
@@ -198,17 +186,13 @@ function search(query, syncResults, asyncResults)
 
 
 // Show info window at marker with content
-function showInfo(marker, content)
-{
+function showInfo(marker, content) {
     // Start div
     let div = "<div id='info'>";
-    if (typeof(content) == "undefined")
-    {
+    if (typeof(content) == "undefined") {
         // http://www.ajaxload.info/
         div += "<img alt='loading' src='/static/ajax-loader.gif'/>";
-    }
-    else
-    {
+    } else {
         div += content;
     }
 
@@ -224,8 +208,7 @@ function showInfo(marker, content)
 
 
 // Update UI's markers
-function update()
-{
+function update() {
     // Get map's bounds
     let bounds = map.getBounds();
     let ne = bounds.getNorthEast();
@@ -239,13 +222,12 @@ function update()
     };
     $.getJSON("/update", parameters, function(data, textStatus, jqXHR) {
 
-       // Remove old markers from map
-       removeMarkers();
+        // Remove old markers from map
+        removeMarkers();
 
-       // Add new markers to map
-       for (let i = 0; i < data.length; i++)
-       {
-           addMarker(data[i]);
-       }
+        // Add new markers to map
+        for (let i = 0; i < data.length; i++) {
+            addMarker(data[i]);
+        }
     });
 };
