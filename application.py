@@ -230,53 +230,52 @@ def register():
 @login_required
 def sell():
     """Sell shares of stock"""
-    # User reached route via POST (as by submitting a form via POST)
+        # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        try:
-            dic = lookup(request.form.get("symbol"))
-            # checking if the symbol right
-            if not request.form.get("symbol"):
-                return apology("Invalid Symbol")
-        except:
-            return apology("Invalid Symbol")
-        try:
-            # getting amount of shares from the user
-            shares = int(request.form.get("shares"))
-            if not int(request.form.get("shares")) > 0:
-                return apology("Input Positive Integer")
-        except:
-            return apology("Input Positive Integer")
-        portfolios = db.execute("SELECT  symbol, SUM(shares) AS sum_shares FROM portfolio WHERE id = :id \
-        AND symbol = :symbol GROUP by symbol", id=session["user_id"], symbol=dic["symbol"])
-        shares = request.form.get("shares")
 
-        if not int(portfolios[0]["sum_shares"]) > int(shares):
+        # checking if the symbol right
+        if not request.form.get("symbol"):
+            return apology("Invalid Symbol")
+
+        # getting amount of shares from the user
+        shares = int(request.form.get("shares"))
+        if shares < 0:
+            return apology("Input Positive Integer")
+
+        portfolios = db.execute("SELECT  symbol, SUM(shares) AS sum_shares FROM portfolio WHERE id = :id \
+        GROUP by symbol", id = session["user_id"])
+
+        quote = lookup(request.form.get("symbol"))
+        price=quote["price"]
+
+        if not int(portfolios[0]["sum_shares"]) > shares:
             return apology("You don't own that many shares")
         else:
             db.execute("INSERT INTO history (symbol, shares, price, id) VALUES( :symbol, :shares, :price, :id)",
-                       symbol=dic["symbol"], shares=- shares, price=usd(dic["price"]), id=session["user_id"])
+                       symbol=portfolios[0]["symbol"], shares=- shares, price=int(quote["price"]), id=session["user_id"])
 
-            users = db.execute("UPDATE users SET cash = cash + :sell WHERE id = :id",
-                               id=session["user_id"], sell=dic["price"] * shares)
+            users = db.execute("UPDATE users SET cash = cash + :sell WHERE id = :id", id = session["user_id"], \
+            sell = quote["price"] * shares)
 
         shares_total = portfolios[0]["sum_shares"] - shares
 
         if shares_total == 0:
-            db.execute("DELETE FROM portfolio WHERE id = :id AND symbol = :symbol", id=session["user_id"], symbol=dic["symbol"])
+            db.execute("DELETE FROM portfolio WHERE id = :id AND symbol = :symbol", \
+            id = session["user_id"], symbol = quote["symbol"])
         else:
-            db.execute("UPDATE portfolio SET shares = :shares WHERE id = :id AND symbol = :symbol",
-                       shares=shares_total, id=session["user_id"], symbol=dic["symbol"])
+            db.execute("UPDATE portfolio SET shares = :shares WHERE id = :id AND symbol = :symbol", \
+            shares = shares_total, id = session["user_id"], symbol = quote["symbol"])
 
         return redirect("/")
 
     else:
         portfolios = db.execute("SELECT  symbol, SUM(shares) AS shares FROM portfolio WHERE id = :id \
-        GROUP by symbol", id=session["user_id"])
+        GROUP by symbol", id = session["user_id"])
 
         for portfolio in portfolios:
             symbol = portfolio["symbol"]
 
-        return render_template("sell.html", portfolios=portfolios)
+        return render_template("sell.html", portfolios = portfolios)
 
 
 def errorhandler(e):

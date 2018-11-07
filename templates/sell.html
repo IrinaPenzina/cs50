@@ -10,7 +10,7 @@
             <select autocomplete="off" autofocus class="form-control" name="symbol" placeholder="e.g., AMZN" type="text"/>
                <option disable selected value="">Symbol</option>
                     {% for portfolio in portfolios %}
-                        <option value = "Symbol">{{ portfolio.symbol }}</option>
+                        <option value = "{{portfolio.symbol}}">{{ portfolio.symbol }}</option>
                     {% endfor %}
             </select>
         </div>
