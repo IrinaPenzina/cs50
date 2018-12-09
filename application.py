@@ -23,6 +23,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -30,6 +31,7 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
+
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
@@ -146,8 +148,8 @@ def register():
             return apology("The passwords do not match.")
 
         # register user
-        result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)", \
-        username=request.form.get("username"), hash=generate_password_hash(request.form.get("password")))
+        result = db.execute("INSERT INTO users (username, hash) VALUES(:username, :hash)",
+                            username=request.form.get("username"), hash=generate_password_hash(request.form.get("password")))
 
         if not result:
             return apology("The user name is already taken.")
@@ -189,13 +191,13 @@ def upload():
                 img_path = join('static/images/', filename)
                 # apologise if the path exists
                 if os.path.exists(img_path):
-                    return apology ("You have uploaded this image already")
-                else: # save the images
+                    return apology("You have uploaded this image already")
+                else:  # save the images
                     file.save(join(dirname(realpath(__file__)), img_path))
 
                 # insert into the database
                 db.execute("INSERT INTO images (id, img_path) VALUES (:id, :img_path)", id=session["user_id"],
-                img_path=img_path)
+                           img_path=img_path)
             else:
                 return apology("Give me some images!")
 
@@ -203,15 +205,16 @@ def upload():
         #message = request.form.get("Inspirational text")
         if request.form.get("Inspirational text"):
             if len(request.form.get("Inspirational text")) < 15:
-                db.execute("INSERT INTO text (id, message) VALUES(:id, :message)", id=session["user_id"],
-                message = request.form.get("Inspirational text"))
+                db.execute("INSERT INTO text (id, message) VALUES(:id, :message)",
+                           id=session["user_id"], message=request.form.get("Inspirational text"))
             else:
                 return apology("Message has to be less then 15 characters.")
         else:
             return apology("Say something inspiring!")
 
         # update the user's text
-        db.execute("UPDATE text SET message = :message WHERE id = :id", id=session["user_id"], message = request.form.get("Inspirational text"))
+        db.execute("UPDATE text SET message = :message WHERE id = :id",
+                   id=session["user_id"], message=request.form.get("Inspirational text"))
 
         return redirect("/")
 
@@ -228,8 +231,7 @@ def index():
 
     someArray = ["/upload"]
 
-    return render_template("index.html", user_images = user_images, user_texts = user_texts)
-
+    return render_template("index.html", user_images=user_images, user_texts=user_texts)
 
 
 def errorhandler(e):
@@ -240,10 +242,3 @@ def errorhandler(e):
 # listen for errors
 for code in default_exceptions:
     app.errorhandler(code)(errorhandler)
-
-
-
-
-
-
-
